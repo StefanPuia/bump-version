@@ -1,10 +1,13 @@
 import * as core from '@actions/core'
 
 import * as httpm from '@actions/http-client'
+import * as am from '@actions/http-client/lib/auth'
 import {env} from 'process'
 
 export async function currentVersion(): Promise<string> {
-  const httpClient = new httpm.HttpClient('bump-version')
+  const token = env.GITHUB_TOKEN
+  const bearerHandler = token ? [new am.BearerCredentialHandler(token)] : []
+  const httpClient = new httpm.HttpClient('bump-version', bearerHandler)
   const response = await httpClient.get(
     `https://api.github.com/repos/${env.GITHUB_REPOSITORY}/releases/latest`
   )
